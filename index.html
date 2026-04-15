@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gerador de Ocorrência de Ponto</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: #ececec;
+      padding: 18px;
+      color: #111;
+    }
+
+    .app {
+      max-width: 1180px;
+      margin: 0 auto;
+    }
+
+    .screen-panel {
+      background: #ffffff;
+      border: 1px solid #cfcfcf;
+      border-radius: 8px;
+      padding: 18px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+      margin-bottom: 14px;
+    }
+
+    .screen-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .top-actions {
+      display: grid;
+      grid-template-columns: 1.3fr 1fr 1fr 1fr;
+      gap: 10px;
+      align-items: end;
+      margin-bottom: 18px;
+    }
+
+    .top-actions label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .top-actions input,
+    .top-actions select,
+    .top-actions button {
+      width: 100%;
+      min-height: 40px;
+      border: 1px solid #cfcfcf;
+      border-radius: 6px;
+      padding: 8px 10px;
+      font-size: 13px;
+      background: #fff;
+    }
+
+    .top-actions button {
+      border: none;
+      background: #1d4ed8;
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .top-actions button.secondary {
+      background: #6b7280;
+    }
+
+    .help {
+      margin-top: 5px;
+      font-size: 11px;
+      color: #555;
+      line-height: 1.35;
+    }
+
+    .form-sheet {
+      width: 100%;
+      max-width: 794px;
+      margin: 0 auto;
+      background: #fff;
+      border: 1px solid #bfbfbf;
+      padding: 18px 16px 22px;
+    }
+
+    .sheet-header {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 16px;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .sheet-header img {
+      width: 102px;
+      height: auto;
+      display: block;
+      margin-left: 6px;
+    }
+
+    .sheet-title {
+      text-align: center;
+      font-size: 17px;
+      font-weight: 700;
+      text-decoration: underline;
+      margin-right: 60px;
+    }
+
+    .field-box {
+      position: relative;
+      border: 1px solid #000;
+      padding: 16px 10px 10px;
+      margin-bottom: 10px;
+    }
+
+    .field-box-title {
+      position: absolute;
+      top: -9px;
+      left: 10px;
+      background: #fff;
+      padding: 0 8px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .line-grid {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 8px;
+      align-items: end;
+      margin-top: 12px;
+    }
+
+    .line-grid:first-child {
+      margin-top: 4px;
+    }
+
+    .line-grid-3 {
+      display: grid;
+      grid-template-columns: auto 1fr auto 180px auto 130px;
+      gap: 8px;
+      align-items: end;
+      margin-top: 12px;
+    }
+
+    .line-grid-2 {
+      display: grid;
+      grid-template-columns: auto 1fr auto 1fr;
+      gap: 8px 10px;
+      align-items: end;
+      margin-top: 12px;
+    }
+
+    .line-label {
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .line-input,
+    .line-select,
+    .line-static {
+      border: none;
+      border-bottom: 1px solid #000;
+      min-height: 26px;
+      font-size: 12px;
+      padding: 0 4px 2px;
+      background: transparent;
+      outline: none;
+      width: 100%;
+    }
+
+    .line-static {
+      display: flex;
+      align-items: end;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .line-select {
+      appearance: none;
+      background-image:
+        linear-gradient(45deg, transparent 50%, #000 50%),
+        linear-gradient(135deg, #000 50%, transparent 50%);
+      background-position:
+        calc(100% - 12px) calc(50% - 2px),
+        calc(100% - 7px) calc(50% - 2px);
+      background-size: 5px 5px, 5px 5px;
+      background-repeat: no-repeat;
+      padding-right: 22px;
+    }
+
+    .occurrences-wrap {
+      margin-top: 8px;
+    }
+
+    .occurrence-block {
+      margin-top: 10px;
+    }
+
+    .occurrence-block + .occurrence-block {
+      margin-top: 16px;
+      padding-top: 12px;
+      border-top: 1px dashed #888;
+    }
+
+    .subtitle {
+      font-size: 12px;
+      margin-top: 10px;
+      margin-bottom: 6px;
+    }
+
+    .radio-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin: 6px 0 10px;
+      font-size: 12px;
+    }
+
+    .radio-group label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .radio-group input[type="radio"] {
+      width: 14px;
+      height: 14px;
+      accent-color: #000;
+    }
+
+    .sign-lines {
+      margin-top: 16px;
+    }
+
+    .sign-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-top: 10px;
+      align-items: end;
+    }
+
+    .sign-grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .sig-card {
+      border: 1px solid #d7d7d7;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .sig-toolbar {
+      display: flex;
+      justify-content: flex-end;
+      padding: 6px 8px;
+      border-bottom: 1px solid #e5e7eb;
+      background: #f8f8f8;
+    }
+
+    .sig-toolbar button {
+      border: none;
+      background: #6b7280;
+      color: #fff;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      cursor: pointer;
+    }
+
+    .sig-title {
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    canvas.signature {
+      width: 100%;
+      height: 120px;
+      display: block;
+      background: #fff;
+      touch-action: none;
+    }
+
+    .screen-buttons {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+      justify-content: center;
+    }
+
+    .screen-buttons button {
+      min-width: 180px;
+      min-height: 42px;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-weight: 700;
+      cursor: pointer;
+      background: #1d4ed8;
+      color: #fff;
+    }
+
+    .screen-buttons button.secondary {
+      background: #6b7280;
+    }
+
+    .print-area {
+      display: none;
+    }
+
+    @page {
+      size: A4 portrait;
+      margin: 10mm;
+    }
+
+    @media print {
+      body {
+        background: #fff;
+        padding: 0;
+      }
+
+      .screen-panel {
+        display: none !important;
+      }
+
+      .print-area {
+        display: block !important;
+      }
+
+      .form-sheet {
+        border: none;
+        margin: 0 auto;
+        padding: 0;
+        width: 100%;
+        max-width: none;
+      }
+
+      .sign-grid-3 {
+        display: none !important;
+      }
+
+      .occurrence-block + .occurrence-block {
+        margin-top: 10px;
+        padding-top: 10px;
+      }
+    }
+
+    @media (max-width: 900px) {
+      body {
+        padding: 10px;
+      }
+
+      .top-actions {
+        grid-template-columns: 1fr;
+      }
+
+      .form-sheet {
+        padding: 14px 12px 18px;
+      }
+
+      .sheet-header {
+        grid-template-columns: 1fr;
+        justify-items: center;
+        gap: 10px;
+      }
+
+      .sheet-title {
+        margin-right: 0;
+        font-size: 16px;
+      }
+
+      .line-grid-3,
+      .line-grid-2,
+      .sign-grid,
+      .sign-grid-3 {
+        grid-template-columns: 1fr;
+      }
+
+      .radio-group {
+        gap: 12px;
+      }
+
+      .screen-buttons {
+        flex-direction: column;
+      }
+
+      .screen-buttons button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="screen-panel">
+      <div class="screen-title">Gerador de Ocorrência de Ponto</div>
+
+      <div class="top-actions">
+        <div>
+          <label>Planilha de funcionários</label>
+          <input type="file" id="arquivoExcel" accept=".xlsx,.xls,.csv" />
+          <div class="help">A planilha deve conter nome, cargo/função e cpf.</div>
+        </div>
+
+        <div>
+          <label>Quantidade de ocorrências</label>
+          <select id="quantidadeOcorrencias">
+            <option value="1">1 ocorrência</option>
+            <option value="2">2 ocorrências</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Atualizar tela</label>
+          <button type="button" id="btnAtualizarTela">Atualizar formulário</button>
+        </div>
+
+        <div>
+          <label>Limpar</label>
+          <button type="button" class="secondary" id="btnLimparFormulario">Limpar</button>
+        </div>
+      </div>
+
+      <div class="form-sheet" id="formularioTela">
+        <div class="sheet-header">
+          <img src="logo-gds.png" alt="GDS Logística" />
+          <div class="sheet-title">Correções e lançamentos manuais</div>
+        </div>
+
+        <div class="field-box">
+          <div class="field-box-title">DADOS DO EMPREGADOR</div>
+
+          <div class="line-grid">
+            <div class="line-label">Razão Social:</div>
+            <select class="line-select" id="empresaSelect">
+              <option value="">Selecionar empregador</option>
+              <option value="CNPJ: 16.637.947/0002-29 Gds Logistica Filial">CNPJ: 16.637.947/0002-29 Gds Logistica Filial</option>
+              <option value="CNPJ: 55.990.578/0001-24 CDSP2 Logistica Ltda">CNPJ: 55.990.578/0001-24 CDSP2 Logistica Ltda</option>
+              <option value="CNPJ: 29.727.360/0001-71 GdsLog Soluções Ltda">CNPJ: 29.727.360/0001-71 GdsLog Soluções Ltda</option>
+            </select>
+          </div>
+
+          <div class="line-grid">
+            <div class="line-label">Endereço:</div>
+            <div class="line-static" id="enderecoEmpregador">Rua Teodoro de Beaurepaire, 34, Ipiranga, São Paulo - SP, 04279-030</div>
+          </div>
+        </div>
+
+        <div class="field-box">
+          <div class="field-box-title">DADOS DO TRABALHADOR</div>
+
+          <div class="line-grid">
+            <div class="line-label">NOME DO COLABORADOR:</div>
+            <select class="line-select" id="colaboradorSelect">
+              <option value="">Selecionar colaborador</option>
+            </select>
+          </div>
+
+          <div class="line-grid-3">
+            <div class="line-label">CARGO:</div>
+            <input class="line-input" id="cargoColaborador" readonly />
+
+            <div class="line-label">CPF:</div>
+            <input class="line-input" id="cpfColaborador" readonly />
+
+            <div></div>
+            <div></div>
+          </div>
+        </div>
+
+        <div class="occurrences-wrap" id="blocoOcorrenciasTela"></div>
+
+        <div class="sign-grid-3">
+          <div>
+            <div class="sig-title">Assinatura digital do colaborador</div>
+            <div class="sig-card">
+              <div class="sig-toolbar">
+                <button type="button" data-clear="assinaturaColaborador">Limpar</button>
+              </div>
+              <canvas class="signature" id="assinaturaColaborador"></canvas>
+            </div>
+          </div>
+
+          <div>
+            <div class="sig-title">Assinatura digital do Líder</div>
+            <div class="sig-card">
+              <div class="sig-toolbar">
+                <button type="button" data-clear="assinaturaLider">Limpar</button>
+              </div>
+              <canvas class="signature" id="assinaturaLider"></canvas>
+            </div>
+          </div>
+
+          <div>
+            <div class="sig-title">Assinatura digital do RH</div>
+            <div class="sig-card">
+              <div class="sig-toolbar">
+                <button type="button" data-clear="assinaturaRH">Limpar</button>
+              </div>
+              <canvas class="signature" id="assinaturaRH"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="screen-buttons">
+          <button type="button" id="btnImprimir">Gerar PDF / Imprimir</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="print-area">
+      <div id="formularioImpressao"></div>
+    </div>
+  </div>
+
+  <script>
+    const ENDERECO_FIXO = "Rua Teodoro de Beaurepaire, 34, Ipiranga, São Paulo - SP, 04279-030";
+
+    const estado = {
+      funcionarios: [],
+      quantidadeOcorrencias: 1
+    };
+
+    function normalizarCabecalho(valor) {
+      return String(valor || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-zA-Z0-9 ]/g, " ")
+        .replace(/\s+/g, " ")
+        .trim()
+        .toUpperCase();
+    }
+
+    function somenteDigitos(valor) {
+      return String(valor || "").replace(/\D/g, "");
+    }
+
+    function formatarCPF(valor) {
+      const v = somenteDigitos(valor).slice(0, 11);
+      if (!v) return "";
+      return v
+        .replace(/(\d{3})(\d)/, "$1.$2")
+        .replace(/(\d{3})(\d)/, "$1.$2")
+        .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+    }
+
+    function criarOcorrenciaHTML(indice) {
+      return `
+        <div class="occurrence-block" data-ocorrencia="${indice}">
+          <div class="line-grid-2">
+            <div class="line-label">Data Ocorrência:</div>
+            <input class="line-input ocorrencia-data" type="date" data-indice="${indice}" />
+
+            <div></div>
+            <div></div>
+          </div>
+
+          <div class="subtitle">Qual registro não foi marcado</div>
+          <div class="radio-group">
+            <label><input type="radio" name="registro_${indice}" value="Entrada"> Entrada</label>
+            <label><input type="radio" name="registro_${indice}" value="Saída Intervalo"> Saída Intervalo</label>
+            <label><input type="radio" name="registro_${indice}" value="Retorno Intervalo"> Retorno Intervalo</label>
+            <label><input type="radio" name="registro_${indice}" value="Saída"> Saída</label>
+          </div>
+
+          <div class="line-grid-2">
+            <div class="line-label">Horário devido da marcação:</div>
+            <input class="line-input ocorrencia-horario" type="time" data-indice="${indice}" />
+
+            <div></div>
+            <div></div>
+          </div>
+
+          <div class="line-grid">
+            <div class="line-label">Justifique o motivo para a não marcação do ponto:</div>
+            <input class="line-input ocorrencia-justificativa" type="text" data-indice="${indice}" />
+          </div>
+        </div>
+      `;
+    }
+
+    function renderOcorrenciasTela() {
+      const container = document.getElementById("blocoOcorrenciasTela");
+      let html = "";
+
+      for (let i = 1; i <= estado.quantidadeOcorrencias; i++) {
+        html += criarOcorrenciaHTML(i);
+      }
+
+      html += `
+        <div class="sign-lines">
+          <div class="line-grid" style="margin-top:16px;">
+            <div class="line-label">Assinatura do colaborador:</div>
+            <div class="line-static"></div>
+          </div>
+
+          <div class="sign-grid">
+            <div class="line-grid" style="margin-top:8px;">
+              <div class="line-label">Assinatura Líder:</div>
+              <div class="line-static"></div>
+            </div>
+
+            <div class="line-grid" style="margin-top:8px;">
+              <div class="line-label">Assinatura RH:</div>
+              <div class="line-static"></div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      container.innerHTML = html;
+    }
+
+    function popularSelectColaborador() {
+      const select = document.getElementById("colaboradorSelect");
+      const valorAtual = select.value;
+      select.innerHTML = '<option value="">Selecionar colaborador</option>';
+
+      estado.funcionarios
+        .slice()
+        .sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"))
+        .forEach((funcionario, idx) => {
+          const option = document.createElement("option");
+          option.value = String(idx);
+          option.textContent = funcionario.nome;
+          select.appendChild(option);
+        });
+
+      if (valorAtual && select.querySelector(`option[value="${valorAtual}"]`)) {
+        select.value = valorAtual;
+      }
+    }
+
+    function preencherDadosColaborador() {
+      const select = document.getElementById("colaboradorSelect");
+      const cargo = document.getElementById("cargoColaborador");
+      const cpf = document.getElementById("cpfColaborador");
+
+      if (!select.value) {
+        cargo.value = "";
+        cpf.value = "";
+        return;
+      }
+
+      const funcionario = estado.funcionarios[Number(select.value)];
+      if (!funcionario) {
+        cargo.value = "";
+        cpf.value = "";
+        return;
+      }
+
+      cargo.value = funcionario.cargo || "";
+      cpf.value = formatarCPF(funcionario.cpf || "");
+    }
+
+    function lerPlanilhaFuncionarios(arquivo) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+          try {
+            const dados = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(dados, { type: "array", raw: false });
+
+            const primeiraAba = workbook.Sheets[workbook.SheetNames[0]];
+            const linhas = XLSX.utils.sheet_to_json(primeiraAba, {
+              header: 1,
+              defval: "",
+              blankrows: false
+            });
+
+            if (!linhas.length) {
+              reject(new Error("A planilha está vazia."));
+              return;
+            }
+
+            let idxCabecalho = -1;
+            let headersNorm = [];
+
+            for (let i = 0; i < Math.min(20, linhas.length); i++) {
+              const linha = (linhas[i] || []).map(col => String(col || "").trim());
+              const norm = linha.map(normalizarCabecalho);
+
+              const temNome = norm.some(h => h === "NOME" || h.includes("NOME"));
+              const temCargo = norm.some(h => h === "CARGO" || h.includes("FUNCAO") || h.includes("FUNÇÃO"));
+              const temCpf = norm.some(h => h === "CPF" || h.includes("CPF"));
+
+              if (temNome && temCargo && temCpf) {
+                idxCabecalho = i;
+                headersNorm = norm;
+                break;
+              }
+            }
+
+            if (idxCabecalho === -1) {
+              reject(new Error("Não foi possível localizar as colunas NOME, CARGO/FUNÇÃO e CPF."));
+              return;
+            }
+
+            const idxNome = headersNorm.findIndex(h => h === "NOME" || h.includes("NOME"));
+            const idxCargo = headersNorm.findIndex(h => h === "CARGO" || h.includes("FUNCAO") || h.includes("FUNÇÃO"));
+            const idxCpf = headersNorm.findIndex(h => h === "CPF" || h.includes("CPF"));
+
+            const funcionarios = [];
+
+            for (let i = idxCabecalho + 1; i < linhas.length; i++) {
+              const linha = linhas[i] || [];
+              const nome = String(linha[idxNome] || "").trim();
+              const cargo = String(linha[idxCargo] || "").trim();
+              const cpf = String(linha[idxCpf] || "").trim();
+
+              if (!nome) continue;
+
+              funcionarios.push({
+                nome,
+                cargo,
+                cpf
+              });
+            }
+
+            if (!funcionarios.length) {
+              reject(new Error("Nenhum colaborador válido foi encontrado na planilha."));
+              return;
+            }
+
+            resolve(funcionarios);
+          } catch (erro) {
+            reject(new Error("Erro ao ler a planilha: " + erro.message));
+          }
+        };
+
+        reader.onerror = function() {
+          reject(new Error("Falha ao abrir a planilha."));
+        };
+
+        reader.readAsArrayBuffer(arquivo);
+      });
+    }
+
+    function formatarDataBR(valor) {
+      if (!valor) return "";
+      const partes = valor.split("-");
+      if (partes.length !== 3) return valor;
+      return `${partes[2]}/${partes[1]}/${partes[0]}`;
+    }
+
+    function coletarOcorrencias() {
+      const ocorrencias = [];
+
+      for (let i = 1; i <= estado.quantidadeOcorrencias; i++) {
+        const data = document.querySelector(`.ocorrencia-data[data-indice="${i}"]`)?.value || "";
+        const horario = document.querySelector(`.ocorrencia-horario[data-indice="${i}"]`)?.value || "";
+        const justificativa = document.querySelector(`.ocorrencia-justificativa[data-indice="${i}"]`)?.value || "";
+        const registro = document.querySelector(`input[name="registro_${i}"]:checked`)?.value || "";
+
+        ocorrencias.push({
+          data,
+          horario,
+          justificativa,
+          registro
+        });
+      }
+
+      return ocorrencias;
+    }
+
+    function assinaturaComoImagem(canvasId) {
+      const canvas = document.getElementById(canvasId);
+      if (!canvas) return "";
+      return canvas.toDataURL("image/png");
+    }
+
+    function validarAntesImprimir() {
+      if (!document.getElementById("empresaSelect").value) {
+        alert("Selecione o empregador.");
+        return false;
+      }
+
+      if (!document.getElementById("colaboradorSelect").value) {
+        alert("Selecione o colaborador.");
+        return false;
+      }
+
+      const ocorrencias = coletarOcorrencias();
+
+      for (let i = 0; i < ocorrencias.length; i++) {
+        const item = ocorrencias[i];
+        if (!item.data || !item.registro || !item.horario || !item.justificativa) {
+          alert(`Preencha todos os campos da ocorrência ${i + 1}.`);
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    function montarFormularioImpressao() {
+      const empresa = document.getElementById("empresaSelect").value || "";
+      const colaborador = document.getElementById("colaboradorSelect").selectedOptions[0]?.textContent || "";
+      const cargo = document.getElementById("cargoColaborador").value || "";
+      const cpf = document.getElementById("cpfColaborador").value || "";
+      const ocorrencias = coletarOcorrencias();
+
+      const assinaturaColaborador = assinaturaComoImagem("assinaturaColaborador");
+      const assinaturaLider = assinaturaComoImagem("assinaturaLider");
+      const assinaturaRH = assinaturaComoImagem("assinaturaRH");
+
+      let htmlOcorrencias = "";
+
+      ocorrencias.forEach((item) => {
+        htmlOcorrencias += `
+          <div class="occurrence-block">
+            <div class="line-grid-2">
+              <div class="line-label">Data Ocorrência:</div>
+              <div class="line-static">${formatarDataBR(item.data)}</div>
+              <div></div>
+              <div></div>
+            </div>
+
+            <div class="subtitle">Qual registro não foi marcado</div>
+            <div class="radio-group">
+              <label><input type="radio" ${item.registro === "Entrada" ? "checked" : ""}> Entrada</label>
+              <label><input type="radio" ${item.registro === "Saída Intervalo" ? "checked" : ""}> Saída Intervalo</label>
+              <label><input type="radio" ${item.registro === "Retorno Intervalo" ? "checked" : ""}> Retorno Intervalo</label>
+              <label><input type="radio" ${item.registro === "Saída" ? "checked" : ""}> Saída</label>
+            </div>
+
+            <div class="line-grid-2">
+              <div class="line-label">Horário devido da marcação:</div>
+              <div class="line-static">${item.horario || ""}</div>
+              <div></div>
+              <div></div>
+            </div>
+
+            <div class="line-grid">
+              <div class="line-label">Justifique o motivo para a não marcação do ponto:</div>
+              <div class="line-static">${item.justificativa || ""}</div>
+            </div>
+          </div>
+        `;
+      });
+
+      const html = `
+        <div class="form-sheet">
+          <div class="sheet-header">
+            <img src="logo-gds.png" alt="GDS Logística" />
+            <div class="sheet-title">Correções e lançamentos manuais</div>
+          </div>
+
+          <div class="field-box">
+            <div class="field-box-title">DADOS DO EMPREGADOR</div>
+
+            <div class="line-grid">
+              <div class="line-label">Razão Social:</div>
+              <div class="line-static">${empresa}</div>
+            </div>
+
+            <div class="line-grid">
+              <div class="line-label">Endereço:</div>
+              <div class="line-static">${ENDERECO_FIXO}</div>
+            </div>
+          </div>
+
+          <div class="field-box">
+            <div class="field-box-title">DADOS DO TRABALHADOR</div>
+
+            <div class="line-grid">
+              <div class="line-label">NOME DO COLABORADOR:</div>
+              <div class="line-static">${colaborador}</div>
+            </div>
+
+            <div class="line-grid-3">
+              <div class="line-label">CARGO:</div>
+              <div class="line-static">${cargo}</div>
+
+              <div class="line-label">CPF:</div>
+              <div class="line-static">${cpf}</div>
+
+              <div></div>
+              <div></div>
+            </div>
+          </div>
+
+          ${htmlOcorrencias}
+
+          <div class="sign-lines">
+            <div class="line-grid" style="margin-top:16px;">
+              <div class="line-label">Assinatura do colaborador:</div>
+              <div class="line-static">${assinaturaColaborador ? `<img src="${assinaturaColaborador}" style="max-height:36px; object-fit:contain;">` : ""}</div>
+            </div>
+
+            <div class="sign-grid">
+              <div class="line-grid" style="margin-top:8px;">
+                <div class="line-label">Assinatura Líder:</div>
+                <div class="line-static">${assinaturaLider ? `<img src="${assinaturaLider}" style="max-height:36px; object-fit:contain;">` : ""}</div>
+              </div>
+
+              <div class="line-grid" style="margin-top:8px;">
+                <div class="line-label">Assinatura RH:</div>
+                <div class="line-static">${assinaturaRH ? `<img src="${assinaturaRH}" style="max-height:36px; object-fit:contain;">` : ""}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      document.getElementById("formularioImpressao").innerHTML = html;
+    }
+
+    function limparAssinatura(id) {
+      const canvas = document.getElementById(id);
+      if (!canvas) return;
+      const ctx = canvas.getContext("2d");
+      const rect = canvas.getBoundingClientRect();
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "#fff";
+      ctx.fillRect(0, 0, rect.width, rect.height);
+      ctx.lineWidth = 2;
+      ctx.lineCap = "round";
+      ctx.strokeStyle = "#000";
+    }
+
+    function configurarAssinatura(id) {
+      const canvas = document.getElementById(id);
+      if (!canvas) return;
+
+      const ctx = canvas.getContext("2d");
+      let desenhando = false;
+
+      function ajustar() {
+        const ratio = Math.max(window.devicePixelRatio || 1, 1);
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = rect.width * ratio;
+        canvas.height = rect.height * ratio;
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.scale(ratio, ratio);
+        ctx.fillStyle = "#fff";
+        ctx.fillRect(0, 0, rect.width, rect.height);
+        ctx.lineWidth = 2;
+        ctx.lineCap = "round";
+        ctx.strokeStyle = "#000";
+      }
+
+      function ponto(evt) {
+        const rect = canvas.getBoundingClientRect();
+        if (evt.touches && evt.touches[0]) {
+          return {
+            x: evt.touches[0].clientX - rect.left,
+            y: evt.touches[0].clientY - rect.top
+          };
+        }
+        return {
+          x: evt.clientX - rect.left,
+          y: evt.clientY - rect.top
+        };
+      }
+
+      function iniciar(evt) {
+        evt.preventDefault();
+        desenhando = true;
+        const p = ponto(evt);
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y);
+      }
+
+      function mover(evt) {
+        if (!desenhando) return;
+        evt.preventDefault();
+        const p = ponto(evt);
+        ctx.lineTo(p.x, p.y);
+        ctx.stroke();
+      }
+
+      function finalizar(evt) {
+        if (!desenhando) return;
+        evt.preventDefault();
+        desenhando = false;
+        ctx.beginPath();
+      }
+
+      canvas.addEventListener("mousedown", iniciar);
+      canvas.addEventListener("mousemove", mover);
+      canvas.addEventListener("mouseup", finalizar);
+      canvas.addEventListener("mouseleave", finalizar);
+      canvas.addEventListener("touchstart", iniciar, { passive: false });
+      canvas.addEventListener("touchmove", mover, { passive: false });
+      canvas.addEventListener("touchend", finalizar, { passive: false });
+
+      ajustar();
+      window.addEventListener("resize", ajustar);
+    }
+
+    function limparFormulario() {
+      document.getElementById("empresaSelect").value = "";
+      document.getElementById("colaboradorSelect").value = "";
+      document.getElementById("cargoColaborador").value = "";
+      document.getElementById("cpfColaborador").value = "";
+      document.getElementById("quantidadeOcorrencias").value = "1";
+      estado.quantidadeOcorrencias = 1;
+      renderOcorrenciasTela();
+      limparAssinatura("assinaturaColaborador");
+      limparAssinatura("assinaturaLider");
+      limparAssinatura("assinaturaRH");
+    }
+
+    function iniciar() {
+      renderOcorrenciasTela();
+
+      configurarAssinatura("assinaturaColaborador");
+      configurarAssinatura("assinaturaLider");
+      configurarAssinatura("assinaturaRH");
+
+      document.getElementById("empresaSelect").addEventListener("change", function() {
+        document.getElementById("enderecoEmpregador").textContent = ENDERECO_FIXO;
+      });
+
+      document.getElementById("colaboradorSelect").addEventListener("change", preencherDadosColaborador);
+
+      document.getElementById("quantidadeOcorrencias").addEventListener("change", function() {
+        estado.quantidadeOcorrencias = Number(this.value || 1);
+        renderOcorrenciasTela();
+      });
+
+      document.getElementById("btnAtualizarTela").addEventListener("click", function() {
+        estado.quantidadeOcorrencias = Number(document.getElementById("quantidadeOcorrencias").value || 1);
+        renderOcorrenciasTela();
+      });
+
+      document.getElementById("arquivoExcel").addEventListener("change", async function(evt) {
+        const arquivo = evt.target.files && evt.target.files[0];
+        if (!arquivo) return;
+
+        try {
+          estado.funcionarios = await lerPlanilhaFuncionarios(arquivo);
+          popularSelectColaborador();
+          alert("Planilha carregada com sucesso.");
+        } catch (erro) {
+          alert(erro.message);
+        }
+      });
+
+      document.getElementById("btnImprimir").addEventListener("click", function() {
+        if (!validarAntesImprimir()) return;
+        montarFormularioImpressao();
+        window.print();
+      });
+
+      document.getElementById("btnLimparFormulario").addEventListener("click", limparFormulario);
+
+      document.querySelectorAll("[data-clear]").forEach(btn => {
+        btn.addEventListener("click", function() {
+          limparAssinatura(this.getAttribute("data-clear"));
+        });
+      });
+
+      document.getElementById("enderecoEmpregador").textContent = ENDERECO_FIXO;
+    }
+
+    document.addEventListener("DOMContentLoaded", iniciar);
+  </script>
+</body>
+</html>
