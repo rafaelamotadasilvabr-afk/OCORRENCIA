@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Gerador de Ocorrência de Ponto</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
   <style>
     * {
@@ -20,7 +19,7 @@
     }
 
     .app {
-      max-width: 1180px;
+      max-width: 1200px;
       margin: 0 auto;
     }
 
@@ -30,18 +29,17 @@
       border-radius: 8px;
       padding: 18px;
       box-shadow: 0 8px 24px rgba(0,0,0,0.06);
-      margin-bottom: 14px;
     }
 
     .screen-title {
       font-size: 18px;
       font-weight: 700;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
     }
 
     .top-actions {
       display: grid;
-      grid-template-columns: 1.3fr 1fr 1fr 1fr;
+      grid-template-columns: 1fr 1fr 1fr;
       gap: 10px;
       align-items: end;
       margin-bottom: 18px;
@@ -54,7 +52,6 @@
       margin-bottom: 6px;
     }
 
-    .top-actions input,
     .top-actions select,
     .top-actions button {
       width: 100%;
@@ -142,13 +139,9 @@
       margin-top: 12px;
     }
 
-    .line-grid:first-child {
-      margin-top: 4px;
-    }
-
     .line-grid-3 {
       display: grid;
-      grid-template-columns: auto 1fr auto 180px auto 130px;
+      grid-template-columns: auto 1fr auto 180px;
       gap: 8px;
       align-items: end;
       margin-top: 12px;
@@ -156,8 +149,8 @@
 
     .line-grid-2 {
       display: grid;
-      grid-template-columns: auto 1fr auto 1fr;
-      gap: 8px 10px;
+      grid-template-columns: auto 180px auto 1fr;
+      gap: 8px;
       align-items: end;
       margin-top: 12px;
     }
@@ -255,52 +248,6 @@
       align-items: end;
     }
 
-    .sign-grid-3 {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 12px;
-      margin-top: 18px;
-    }
-
-    .sig-card {
-      border: 1px solid #d7d7d7;
-      border-radius: 8px;
-      overflow: hidden;
-      background: #fff;
-    }
-
-    .sig-toolbar {
-      display: flex;
-      justify-content: flex-end;
-      padding: 6px 8px;
-      border-bottom: 1px solid #e5e7eb;
-      background: #f8f8f8;
-    }
-
-    .sig-toolbar button {
-      border: none;
-      background: #6b7280;
-      color: #fff;
-      padding: 6px 10px;
-      border-radius: 6px;
-      font-size: 11px;
-      cursor: pointer;
-    }
-
-    .sig-title {
-      font-size: 12px;
-      font-weight: 700;
-      margin-bottom: 6px;
-    }
-
-    canvas.signature {
-      width: 100%;
-      height: 120px;
-      display: block;
-      background: #fff;
-      touch-action: none;
-    }
-
     .screen-buttons {
       display: flex;
       gap: 10px;
@@ -329,9 +276,97 @@
       display: none;
     }
 
+    .print-page {
+      width: 210mm;
+      min-height: 297mm;
+      margin: 0 auto;
+      background: #fff;
+      padding: 0;
+    }
+
+    .print-form {
+      width: 100%;
+      background: #fff;
+      border: 1px solid #bfbfbf;
+      padding: 18px 16px 22px;
+      margin-bottom: 10mm;
+    }
+
+    .print-page.double {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      gap: 4mm;
+      padding: 0;
+    }
+
+    .print-page.double .print-form {
+      flex: 1;
+      padding: 10px 12px 12px;
+      margin-bottom: 0;
+      transform-origin: top left;
+    }
+
+    .print-page.double .sheet-header {
+      grid-template-columns: 90px 1fr;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .print-page.double .sheet-header img {
+      width: 78px;
+      margin-left: 2px;
+    }
+
+    .print-page.double .sheet-title {
+      font-size: 14px;
+      margin-right: 20px;
+    }
+
+    .print-page.double .field-box {
+      padding: 12px 8px 8px;
+      margin-bottom: 8px;
+    }
+
+    .print-page.double .field-box-title {
+      font-size: 11px;
+      top: -8px;
+    }
+
+    .print-page.double .line-grid,
+    .print-page.double .line-grid-2,
+    .print-page.double .line-grid-3 {
+      margin-top: 8px;
+    }
+
+    .print-page.double .line-label,
+    .print-page.double .line-static,
+    .print-page.double .subtitle,
+    .print-page.double .radio-group {
+      font-size: 11px;
+    }
+
+    .print-page.double .radio-group {
+      gap: 12px;
+      margin: 5px 0 8px;
+    }
+
+    .print-page.double .occurrence-block {
+      margin-top: 6px;
+    }
+
+    .print-page.double .sign-lines {
+      margin-top: 10px;
+    }
+
+    .print-page.double .sign-grid {
+      gap: 10px;
+      margin-top: 8px;
+    }
+
     @page {
       size: A4 portrait;
-      margin: 10mm;
+      margin: 8mm;
     }
 
     @media print {
@@ -346,23 +381,6 @@
 
       .print-area {
         display: block !important;
-      }
-
-      .form-sheet {
-        border: none;
-        margin: 0 auto;
-        padding: 0;
-        width: 100%;
-        max-width: none;
-      }
-
-      .sign-grid-3 {
-        display: none !important;
-      }
-
-      .occurrence-block + .occurrence-block {
-        margin-top: 10px;
-        padding-top: 10px;
       }
     }
 
@@ -392,8 +410,7 @@
 
       .line-grid-3,
       .line-grid-2,
-      .sign-grid,
-      .sign-grid-3 {
+      .sign-grid {
         grid-template-columns: 1fr;
       }
 
@@ -418,12 +435,6 @@
 
       <div class="top-actions">
         <div>
-          <label>Planilha de funcionários</label>
-          <input type="file" id="arquivoExcel" accept=".xlsx,.xls,.csv" />
-          <div class="help">A planilha deve conter nome, cargo/função e cpf.</div>
-        </div>
-
-        <div>
           <label>Quantidade de ocorrências</label>
           <select id="quantidadeOcorrencias">
             <option value="1">1 ocorrência</option>
@@ -444,7 +455,7 @@
 
       <div class="form-sheet" id="formularioTela">
         <div class="sheet-header">
-          <img src="logo-gds.png" alt="GDS Logística" />
+          <img src="logo.png" alt="GDS Logística" />
           <div class="sheet-title">Correções e lançamentos manuais</div>
         </div>
 
@@ -483,45 +494,10 @@
 
             <div class="line-label">CPF:</div>
             <input class="line-input" id="cpfColaborador" readonly />
-
-            <div></div>
-            <div></div>
           </div>
         </div>
 
         <div class="occurrences-wrap" id="blocoOcorrenciasTela"></div>
-
-        <div class="sign-grid-3">
-          <div>
-            <div class="sig-title">Assinatura digital do colaborador</div>
-            <div class="sig-card">
-              <div class="sig-toolbar">
-                <button type="button" data-clear="assinaturaColaborador">Limpar</button>
-              </div>
-              <canvas class="signature" id="assinaturaColaborador"></canvas>
-            </div>
-          </div>
-
-          <div>
-            <div class="sig-title">Assinatura digital do Líder</div>
-            <div class="sig-card">
-              <div class="sig-toolbar">
-                <button type="button" data-clear="assinaturaLider">Limpar</button>
-              </div>
-              <canvas class="signature" id="assinaturaLider"></canvas>
-            </div>
-          </div>
-
-          <div>
-            <div class="sig-title">Assinatura digital do RH</div>
-            <div class="sig-card">
-              <div class="sig-toolbar">
-                <button type="button" data-clear="assinaturaRH">Limpar</button>
-              </div>
-              <canvas class="signature" id="assinaturaRH"></canvas>
-            </div>
-          </div>
-        </div>
 
         <div class="screen-buttons">
           <button type="button" id="btnImprimir">Gerar PDF / Imprimir</button>
@@ -538,19 +514,71 @@
     const ENDERECO_FIXO = "Rua Teodoro de Beaurepaire, 34, Ipiranga, São Paulo - SP, 04279-030";
 
     const estado = {
-      funcionarios: [],
-      quantidadeOcorrencias: 1
+      quantidadeOcorrencias: 1,
+      funcionarios: [
+        { cargo: "AUXILIAR DE LIMPEZA", nome: "CLECIA DA SILVA", cpf: "8049843440" },
+        { cargo: "ASSISTENTE LOGISTICA", nome: "JULIA DE ASSIS DA SILVA", cpf: "47558327806" },
+        { cargo: "LIDER OPERACIONAL DE CARGAS SENIOR", nome: "LUIS CARLOS DOS SANTOS", cpf: "23319637894" },
+        { cargo: "AUXILIAR EXPEDIÇÃO", nome: "NICOLLAS DOMINGUES SILVA", cpf: "50503447862" },
+        { cargo: "AUXILIAR EXPEDIÇÃO", nome: "PAULO HENRIQUE GONÇALVES DE JESUS", cpf: "45104268870" },
+        { cargo: "AUXILIAR EXPEDIÇÃO", nome: "ROSEANE FRANÇA DE SOUZA", cpf: "35091073817" },
+        { cargo: "AUXILIAR EXPEDIÇÃO", nome: "VICTOR DE AQUINO OLIVEIRA", cpf: "42347938843" },
+        { cargo: "AUXILIAR EXPEDIÇÃO", nome: "WELLINGTON NOGUEIRA DE SOUZA", cpf: "37557818830" },
+        { cargo: "AUXILIAR DE EXPEDIÇÃO", nome: "ESTER DE ANDRADE GOMES", cpf: "52264727810" },
+        { cargo: "AUXILIAR DE EXPEDIÇÃO", nome: "GUSTAVO FERREIRA DE OLIVEIRA", cpf: "31250989809" },
+        { cargo: "AUXILIAR DE EXPEDIÇÃO", nome: "GUSTAVO GABRIEL MORAES AMORIM", cpf: "50768725852" },
+        { cargo: "AUXILIAR DE EXPEDIÇÃO", nome: "NILSON DA SILVA LIMA", cpf: "45496938864" },
+        { cargo: "AUXILIAR EXPEDIÇÃO", nome: "EDSON CASARI AMORIN", cpf: "52436739862" },
+        { cargo: "AJUDANTE MOTORISTA", nome: "GABRIEL PEREIRA DOS REIS", cpf: "40147597846" },
+        { cargo: "ASSISTENTE DE EXPEDIÇÃO", nome: "GENIVAL VIEIRA DA SILVA JUNIOR", cpf: "29383009802" },
+        { cargo: "AUXILIAR EXPEDIÇÃO", nome: "LAYSA VITORIA VIEIRA SANTIAGO", cpf: "57287232847" },
+        { cargo: "AUXILIAR EXPEDIÇÃO", nome: "LEONARDO CHAGAS AGUIAR", cpf: "47419835870" },
+        { cargo: "AUXILIAR EXPEDIÇÃO", nome: "LUCAS MATEUS AUGUSTA", cpf: "48837396864" },
+        { cargo: "LIDER OPERACIONAL DE CARGAS JUNIOR", nome: "MARCELO DA SILVA ARAUJO", cpf: "38854736821" },
+        { cargo: "AUXILIAR EXPEDIÇÃO", nome: "PAOLA VITORIA DA SILVA SOUSA", cpf: "44164538848" },
+        { cargo: "AUXILIAR EXPEDIÇÃO", nome: "VITOR VINICIUS FERREIRA DO CARMO SCAVUZZ", cpf: "48856375893" },
+        { cargo: "SUP OPERACIONAL DE LOGISTICA JUNIOR", nome: "WALLACY THOMAS DA SILVA CAVALCANTE", cpf: "44554625893" },
+        { cargo: "AUXILIAR DE EXPEDIÇÃO", nome: "EUCLIDES ENRIQUE PADOVEZI", cpf: "47064148811" },
+        { cargo: "AUXILIAR EXPEDIÇÃO", nome: "ALBERTO JUNIOR DOS SANTOS", cpf: "38003983894" },
+        { cargo: "AUXILIAR EXPEDIÇÃO", nome: "ANDERSON ARAUJO DE SOUSA", cpf: "48969349898" },
+        { cargo: "LIDER OPERACIONAL DE CARGAS JUNIOR", nome: "FLAVIO CIRILO VIANA DE OLIVEIRA", cpf: "5904279701" },
+        { cargo: "SUP OPERACIONAL DE CARGAS PLENO", nome: "MARCOS FERREIRA MACIEL", cpf: "25474793898" },
+        { cargo: "AJUDANTE DE MOTORISTA", nome: "GUILHERME HERMINIO MARINHO", cpf: "14407041471" },
+        { cargo: "MOTORISTA", nome: "LEONARDO PEREIRA GARCIA", cpf: "46462997800" },
+        { cargo: "MOTORISTA", nome: "WESLEY TEIXEIRA DE OLIVEIRA", cpf: "39761299848" },
+        { cargo: "MOTORISTA DE CAMINHAO", nome: "AGUINALDO TIMOTEO DOS SANTOS", cpf: "16519105880" },
+        { cargo: "MOTORISTA DE CAMINHAO", nome: "CARLOS ALBERTO LUZ DE SOUZA", cpf: "13642175899" },
+        { cargo: "MOTORISTA", nome: "DANIEL ABADE DE MELO", cpf: "29328603803" },
+        { cargo: "MOTORISTA", nome: "FABRICIO DA SILVA", cpf: "30641054858" },
+        { cargo: "MOTORISTA DE CAMINHAO", nome: "JOSENALDO BATISTA DE OLIVEIRA", cpf: "67604137415" },
+        { cargo: "MOTORISTA", nome: "PAULO JOSÉ MORAIS DO NASCIMENTO", cpf: "16698431818" },
+        { cargo: "MOTORISTA", nome: "SILESIO PEREIRA NUNES", cpf: "12416947613" },
+        { cargo: "MOTORISTA", nome: "THOMAS ROGERIO BATISTA", cpf: "35841105809" },
+        { cargo: "AJUDANTE DE MOTORISTA", nome: "GILMAR JOSÉ DOS SANTOS", cpf: "2415328413" },
+        { cargo: "MOTORISTA DE CAMINHAO", nome: "RONILDO HERMINIO", cpf: "2286534446" },
+        { cargo: "MOTORISTA DE CAMINHAO", nome: "AUSTREGELIO BARBOSA DE QUEIROZ", cpf: "28748256897" },
+        { cargo: "MOTORISTA", nome: "DAVID SILVESTRE PEREIRA", cpf: "38167479811" },
+        { cargo: "MOTORISTA DE CAMINHAO", nome: "DOUGLAS MANCINI CARLOS", cpf: "40430267819" },
+        { cargo: "MOTORISTA DE CAMINHAO", nome: "MARLON DOS SANTOS", cpf: "11830800426" },
+        { cargo: "MOTORISTA DE CAMINHAO", nome: "RICARDO RAIMUNDO DA SILVA", cpf: "14694401807" },
+        { cargo: "MOTORISTA DE CAMINHAO", nome: "RODRIGO LIMA HENRIQUE", cpf: "32008262820" },
+        { cargo: "MOTORISTA", nome: "WEVERTON FRANCISCO DA SILVA", cpf: "37903840894" },
+        { cargo: "MOTORISTA DE CAMINHAO", nome: "WILLAS ELEUTÉRIO DA SILVA", cpf: "70374774439" },
+        { cargo: "MOTORISTA DE CAMINHAO", nome: "WILLIAN DOS SANTOS SILVA", cpf: "30881944882" },
+        { cargo: "AUX DE LOGISTICA", nome: "ALICE DA SILVA SANTOS", cpf: "55119457819" },
+        { cargo: "AUXILIAR DE EXPEDIÇÃO", nome: "THAINA MELO MEDEIROS", cpf: "70581717260" },
+        { cargo: "AUXILIAR DE LOGISTICA", nome: "ANA PAULA SOUZA", cpf: "32865177807" },
+        { cargo: "ASSISTENTE LOGISTICA", nome: "RAFAELA GARCIA DE OLIVEIRA TEIXEIRA", cpf: "39882386865" },
+        { cargo: "LIDER OPERACIONAL DE CARGAS SENIOR", nome: "VINICIUS DE LIMA SOARES", cpf: "46307775807" },
+        { cargo: "ASSISTENTE LOGISTICA", nome: "ALEX LEANDRO RIBEIRO DA SILVA", cpf: "16097728816" },
+        { cargo: "ASSISTENTE LOGISTICA", nome: "GEISA SANTOS SOUSA", cpf: "50873821858" },
+        { cargo: "ASSISTENTE LOGISTICA", nome: "GIULIA RIBEIRO ZERBINI", cpf: "53528671882" },
+        { cargo: "ASSISTENTE LOGISTICA", nome: "KELLI CRISTINA OLIVEIRA RODRIGUES", cpf: "44961268852" },
+        { cargo: "SUP OPERACIONAL DE CARGAS PLENO", nome: "RAFAELA MOTA DA SILVA", cpf: "37267229808" },
+        { cargo: "ASSISTENTE LOGISTICA", nome: "STEFANY NASCIMENTO DIAS", cpf: "12543483446" },
+        { cargo: "AUXILIAR DE EXPEDIÇÃO", nome: "VITOR GUSTAVO LIMA DOS SANTOS", cpf: "49105157803" }
+      ]
     };
-
-    function normalizarCabecalho(valor) {
-      return String(valor || "")
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .replace(/[^a-zA-Z0-9 ]/g, " ")
-        .replace(/\s+/g, " ")
-        .trim()
-        .toUpperCase();
-    }
 
     function somenteDigitos(valor) {
       return String(valor || "").replace(/\D/g, "");
@@ -565,13 +593,19 @@
         .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
     }
 
+    function formatarDataBR(valor) {
+      if (!valor) return "";
+      const partes = valor.split("-");
+      if (partes.length !== 3) return valor;
+      return `${partes[2]}/${partes[1]}/${partes[0]}`;
+    }
+
     function criarOcorrenciaHTML(indice) {
       return `
         <div class="occurrence-block" data-ocorrencia="${indice}">
           <div class="line-grid-2">
             <div class="line-label">Data Ocorrência:</div>
             <input class="line-input ocorrencia-data" type="date" data-indice="${indice}" />
-
             <div></div>
             <div></div>
           </div>
@@ -587,7 +621,6 @@
           <div class="line-grid-2">
             <div class="line-label">Horário devido da marcação:</div>
             <input class="line-input ocorrencia-horario" type="time" data-indice="${indice}" />
-
             <div></div>
             <div></div>
           </div>
@@ -605,36 +638,73 @@
       let html = "";
 
       for (let i = 1; i <= estado.quantidadeOcorrencias; i++) {
-        html += criarOcorrenciaHTML(i);
+        html += `
+          <div class="form-section-copy">
+            ${estado.quantidadeOcorrencias === 2 ? `
+              <div class="sheet-header" style="margin-top: 4px;">
+                <img src="logo.png" alt="GDS Logística" />
+                <div class="sheet-title">Correções e lançamentos manuais</div>
+              </div>
+            ` : ""}
+            ${estado.quantidadeOcorrencias === 2 ? `
+              <div class="field-box">
+                <div class="field-box-title">DADOS DO EMPREGADOR</div>
+                <div class="line-grid">
+                  <div class="line-label">Razão Social:</div>
+                  <div class="line-static">${document.getElementById("empresaSelect")?.value || ""}</div>
+                </div>
+                <div class="line-grid">
+                  <div class="line-label">Endereço:</div>
+                  <div class="line-static">${ENDERECO_FIXO}</div>
+                </div>
+              </div>
+
+              <div class="field-box">
+                <div class="field-box-title">DADOS DO TRABALHADOR</div>
+                <div class="line-grid">
+                  <div class="line-label">NOME DO COLABORADOR:</div>
+                  <div class="line-static">${document.getElementById("colaboradorSelect")?.selectedOptions?.[0]?.textContent !== "Selecionar colaborador" ? (document.getElementById("colaboradorSelect")?.selectedOptions?.[0]?.textContent || "") : ""}</div>
+                </div>
+                <div class="line-grid-3">
+                  <div class="line-label">CARGO:</div>
+                  <div class="line-static">${document.getElementById("cargoColaborador")?.value || ""}</div>
+                  <div class="line-label">CPF:</div>
+                  <div class="line-static">${document.getElementById("cpfColaborador")?.value || ""}</div>
+                </div>
+              </div>
+            ` : ""}
+            ${criarOcorrenciaHTML(i)}
+            <div class="sign-lines">
+              <div class="line-grid" style="margin-top:16px;">
+                <div class="line-label">Assinatura do colaborador:</div>
+                <div class="line-static"></div>
+              </div>
+
+              <div class="sign-grid">
+                <div class="line-grid" style="margin-top:8px;">
+                  <div class="line-label">Assinatura Líder:</div>
+                  <div class="line-static"></div>
+                </div>
+
+                <div class="line-grid" style="margin-top:8px;">
+                  <div class="line-label">Assinatura RH:</div>
+                  <div class="line-static"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
       }
 
-      html += `
-        <div class="sign-lines">
-          <div class="line-grid" style="margin-top:16px;">
-            <div class="line-label">Assinatura do colaborador:</div>
-            <div class="line-static"></div>
-          </div>
-
-          <div class="sign-grid">
-            <div class="line-grid" style="margin-top:8px;">
-              <div class="line-label">Assinatura Líder:</div>
-              <div class="line-static"></div>
-            </div>
-
-            <div class="line-grid" style="margin-top:8px;">
-              <div class="line-label">Assinatura RH:</div>
-              <div class="line-static"></div>
-            </div>
-          </div>
-        </div>
-      `;
-
-      container.innerHTML = html;
+      if (estado.quantidadeOcorrencias === 1) {
+        container.innerHTML = html;
+      } else {
+        container.innerHTML = html;
+      }
     }
 
     function popularSelectColaborador() {
       const select = document.getElementById("colaboradorSelect");
-      const valorAtual = select.value;
       select.innerHTML = '<option value="">Selecionar colaborador</option>';
 
       estado.funcionarios
@@ -646,10 +716,6 @@
           option.textContent = funcionario.nome;
           select.appendChild(option);
         });
-
-      if (valorAtual && select.querySelector(`option[value="${valorAtual}"]`)) {
-        select.value = valorAtual;
-      }
     }
 
     function preencherDadosColaborador() {
@@ -660,109 +726,21 @@
       if (!select.value) {
         cargo.value = "";
         cpf.value = "";
-        return;
+      } else {
+        const funcionario = estado.funcionarios[Number(select.value)];
+        cargo.value = funcionario?.cargo || "";
+        cpf.value = formatarCPF(funcionario?.cpf || "");
       }
 
-      const funcionario = estado.funcionarios[Number(select.value)];
-      if (!funcionario) {
-        cargo.value = "";
-        cpf.value = "";
-        return;
+      if (estado.quantidadeOcorrencias === 2) {
+        renderOcorrenciasTela();
       }
-
-      cargo.value = funcionario.cargo || "";
-      cpf.value = formatarCPF(funcionario.cpf || "");
     }
 
-    function lerPlanilhaFuncionarios(arquivo) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-
-        reader.onload = function(e) {
-          try {
-            const dados = new Uint8Array(e.target.result);
-            const workbook = XLSX.read(dados, { type: "array", raw: false });
-
-            const primeiraAba = workbook.Sheets[workbook.SheetNames[0]];
-            const linhas = XLSX.utils.sheet_to_json(primeiraAba, {
-              header: 1,
-              defval: "",
-              blankrows: false
-            });
-
-            if (!linhas.length) {
-              reject(new Error("A planilha está vazia."));
-              return;
-            }
-
-            let idxCabecalho = -1;
-            let headersNorm = [];
-
-            for (let i = 0; i < Math.min(20, linhas.length); i++) {
-              const linha = (linhas[i] || []).map(col => String(col || "").trim());
-              const norm = linha.map(normalizarCabecalho);
-
-              const temNome = norm.some(h => h === "NOME" || h.includes("NOME"));
-              const temCargo = norm.some(h => h === "CARGO" || h.includes("FUNCAO") || h.includes("FUNÇÃO"));
-              const temCpf = norm.some(h => h === "CPF" || h.includes("CPF"));
-
-              if (temNome && temCargo && temCpf) {
-                idxCabecalho = i;
-                headersNorm = norm;
-                break;
-              }
-            }
-
-            if (idxCabecalho === -1) {
-              reject(new Error("Não foi possível localizar as colunas NOME, CARGO/FUNÇÃO e CPF."));
-              return;
-            }
-
-            const idxNome = headersNorm.findIndex(h => h === "NOME" || h.includes("NOME"));
-            const idxCargo = headersNorm.findIndex(h => h === "CARGO" || h.includes("FUNCAO") || h.includes("FUNÇÃO"));
-            const idxCpf = headersNorm.findIndex(h => h === "CPF" || h.includes("CPF"));
-
-            const funcionarios = [];
-
-            for (let i = idxCabecalho + 1; i < linhas.length; i++) {
-              const linha = linhas[i] || [];
-              const nome = String(linha[idxNome] || "").trim();
-              const cargo = String(linha[idxCargo] || "").trim();
-              const cpf = String(linha[idxCpf] || "").trim();
-
-              if (!nome) continue;
-
-              funcionarios.push({
-                nome,
-                cargo,
-                cpf
-              });
-            }
-
-            if (!funcionarios.length) {
-              reject(new Error("Nenhum colaborador válido foi encontrado na planilha."));
-              return;
-            }
-
-            resolve(funcionarios);
-          } catch (erro) {
-            reject(new Error("Erro ao ler a planilha: " + erro.message));
-          }
-        };
-
-        reader.onerror = function() {
-          reject(new Error("Falha ao abrir a planilha."));
-        };
-
-        reader.readAsArrayBuffer(arquivo);
-      });
-    }
-
-    function formatarDataBR(valor) {
-      if (!valor) return "";
-      const partes = valor.split("-");
-      if (partes.length !== 3) return valor;
-      return `${partes[2]}/${partes[1]}/${partes[0]}`;
+    function atualizarEmpresaDuplicada() {
+      if (estado.quantidadeOcorrencias === 2) {
+        renderOcorrenciasTela();
+      }
     }
 
     function coletarOcorrencias() {
@@ -783,12 +761,6 @@
       }
 
       return ocorrencias;
-    }
-
-    function assinaturaComoImagem(canvasId) {
-      const canvas = document.getElementById(canvasId);
-      if (!canvas) return "";
-      return canvas.toDataURL("image/png");
     }
 
     function validarAntesImprimir() {
@@ -815,67 +787,20 @@
       return true;
     }
 
-    function montarFormularioImpressao() {
-      const empresa = document.getElementById("empresaSelect").value || "";
-      const colaborador = document.getElementById("colaboradorSelect").selectedOptions[0]?.textContent || "";
-      const cargo = document.getElementById("cargoColaborador").value || "";
-      const cpf = document.getElementById("cpfColaborador").value || "";
-      const ocorrencias = coletarOcorrencias();
-
-      const assinaturaColaborador = assinaturaComoImagem("assinaturaColaborador");
-      const assinaturaLider = assinaturaComoImagem("assinaturaLider");
-      const assinaturaRH = assinaturaComoImagem("assinaturaRH");
-
-      let htmlOcorrencias = "";
-
-      ocorrencias.forEach((item) => {
-        htmlOcorrencias += `
-          <div class="occurrence-block">
-            <div class="line-grid-2">
-              <div class="line-label">Data Ocorrência:</div>
-              <div class="line-static">${formatarDataBR(item.data)}</div>
-              <div></div>
-              <div></div>
-            </div>
-
-            <div class="subtitle">Qual registro não foi marcado</div>
-            <div class="radio-group">
-              <label><input type="radio" ${item.registro === "Entrada" ? "checked" : ""}> Entrada</label>
-              <label><input type="radio" ${item.registro === "Saída Intervalo" ? "checked" : ""}> Saída Intervalo</label>
-              <label><input type="radio" ${item.registro === "Retorno Intervalo" ? "checked" : ""}> Retorno Intervalo</label>
-              <label><input type="radio" ${item.registro === "Saída" ? "checked" : ""}> Saída</label>
-            </div>
-
-            <div class="line-grid-2">
-              <div class="line-label">Horário devido da marcação:</div>
-              <div class="line-static">${item.horario || ""}</div>
-              <div></div>
-              <div></div>
-            </div>
-
-            <div class="line-grid">
-              <div class="line-label">Justifique o motivo para a não marcação do ponto:</div>
-              <div class="line-static">${item.justificativa || ""}</div>
-            </div>
-          </div>
-        `;
-      });
-
-      const html = `
-        <div class="form-sheet">
+    function montarFormularioBaseImpressao(empresa, colaborador, cargo, cpf, ocorrencia) {
+      return `
+        <div class="print-form">
           <div class="sheet-header">
-            <img src="logo-gds.png" alt="GDS Logística" />
+            <img src="logo.png" alt="GDS Logística" />
             <div class="sheet-title">Correções e lançamentos manuais</div>
           </div>
 
           <div class="field-box">
             <div class="field-box-title">DADOS DO EMPREGADOR</div>
-
             <div class="line-grid">
               <div class="line-label">Razão Social:</div>
               <div class="line-static">${empresa}</div>
             </div>
-
             <div class="line-grid">
               <div class="line-label">Endereço:</div>
               <div class="line-static">${ENDERECO_FIXO}</div>
@@ -884,132 +809,94 @@
 
           <div class="field-box">
             <div class="field-box-title">DADOS DO TRABALHADOR</div>
-
             <div class="line-grid">
               <div class="line-label">NOME DO COLABORADOR:</div>
               <div class="line-static">${colaborador}</div>
             </div>
-
             <div class="line-grid-3">
               <div class="line-label">CARGO:</div>
               <div class="line-static">${cargo}</div>
-
               <div class="line-label">CPF:</div>
               <div class="line-static">${cpf}</div>
-
-              <div></div>
-              <div></div>
             </div>
           </div>
 
-          ${htmlOcorrencias}
+          <div class="occurrence-block">
+            <div class="line-grid-2">
+              <div class="line-label">Data Ocorrência:</div>
+              <div class="line-static">${formatarDataBR(ocorrencia.data)}</div>
+              <div></div>
+              <div></div>
+            </div>
+
+            <div class="subtitle">Qual registro não foi marcado</div>
+            <div class="radio-group">
+              <label><input type="radio" ${ocorrencia.registro === "Entrada" ? "checked" : ""}> Entrada</label>
+              <label><input type="radio" ${ocorrencia.registro === "Saída Intervalo" ? "checked" : ""}> Saída Intervalo</label>
+              <label><input type="radio" ${ocorrencia.registro === "Retorno Intervalo" ? "checked" : ""}> Retorno Intervalo</label>
+              <label><input type="radio" ${ocorrencia.registro === "Saída" ? "checked" : ""}> Saída</label>
+            </div>
+
+            <div class="line-grid-2">
+              <div class="line-label">Horário devido da marcação:</div>
+              <div class="line-static">${ocorrencia.horario || ""}</div>
+              <div></div>
+              <div></div>
+            </div>
+
+            <div class="line-grid">
+              <div class="line-label">Justifique o motivo para a não marcação do ponto:</div>
+              <div class="line-static">${ocorrencia.justificativa || ""}</div>
+            </div>
+          </div>
 
           <div class="sign-lines">
             <div class="line-grid" style="margin-top:16px;">
               <div class="line-label">Assinatura do colaborador:</div>
-              <div class="line-static">${assinaturaColaborador ? `<img src="${assinaturaColaborador}" style="max-height:36px; object-fit:contain;">` : ""}</div>
+              <div class="line-static"></div>
             </div>
 
             <div class="sign-grid">
               <div class="line-grid" style="margin-top:8px;">
                 <div class="line-label">Assinatura Líder:</div>
-                <div class="line-static">${assinaturaLider ? `<img src="${assinaturaLider}" style="max-height:36px; object-fit:contain;">` : ""}</div>
+                <div class="line-static"></div>
               </div>
 
               <div class="line-grid" style="margin-top:8px;">
                 <div class="line-label">Assinatura RH:</div>
-                <div class="line-static">${assinaturaRH ? `<img src="${assinaturaRH}" style="max-height:36px; object-fit:contain;">` : ""}</div>
+                <div class="line-static"></div>
               </div>
             </div>
           </div>
         </div>
       `;
+    }
+
+    function montarFormularioImpressao() {
+      const empresa = document.getElementById("empresaSelect").value || "";
+      const colaborador = document.getElementById("colaboradorSelect").selectedOptions[0]?.textContent || "";
+      const cargo = document.getElementById("cargoColaborador").value || "";
+      const cpf = document.getElementById("cpfColaborador").value || "";
+      const ocorrencias = coletarOcorrencias();
+
+      let html = "";
+
+      if (estado.quantidadeOcorrencias === 1) {
+        html = `
+          <div class="print-page">
+            ${montarFormularioBaseImpressao(empresa, colaborador, cargo, cpf, ocorrencias[0])}
+          </div>
+        `;
+      } else {
+        html = `
+          <div class="print-page double">
+            ${montarFormularioBaseImpressao(empresa, colaborador, cargo, cpf, ocorrencias[0])}
+            ${montarFormularioBaseImpressao(empresa, colaborador, cargo, cpf, ocorrencias[1])}
+          </div>
+        `;
+      }
 
       document.getElementById("formularioImpressao").innerHTML = html;
-    }
-
-    function limparAssinatura(id) {
-      const canvas = document.getElementById(id);
-      if (!canvas) return;
-      const ctx = canvas.getContext("2d");
-      const rect = canvas.getBoundingClientRect();
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = "#fff";
-      ctx.fillRect(0, 0, rect.width, rect.height);
-      ctx.lineWidth = 2;
-      ctx.lineCap = "round";
-      ctx.strokeStyle = "#000";
-    }
-
-    function configurarAssinatura(id) {
-      const canvas = document.getElementById(id);
-      if (!canvas) return;
-
-      const ctx = canvas.getContext("2d");
-      let desenhando = false;
-
-      function ajustar() {
-        const ratio = Math.max(window.devicePixelRatio || 1, 1);
-        const rect = canvas.getBoundingClientRect();
-        canvas.width = rect.width * ratio;
-        canvas.height = rect.height * ratio;
-        ctx.setTransform(1, 0, 0, 1, 0, 0);
-        ctx.scale(ratio, ratio);
-        ctx.fillStyle = "#fff";
-        ctx.fillRect(0, 0, rect.width, rect.height);
-        ctx.lineWidth = 2;
-        ctx.lineCap = "round";
-        ctx.strokeStyle = "#000";
-      }
-
-      function ponto(evt) {
-        const rect = canvas.getBoundingClientRect();
-        if (evt.touches && evt.touches[0]) {
-          return {
-            x: evt.touches[0].clientX - rect.left,
-            y: evt.touches[0].clientY - rect.top
-          };
-        }
-        return {
-          x: evt.clientX - rect.left,
-          y: evt.clientY - rect.top
-        };
-      }
-
-      function iniciar(evt) {
-        evt.preventDefault();
-        desenhando = true;
-        const p = ponto(evt);
-        ctx.beginPath();
-        ctx.moveTo(p.x, p.y);
-      }
-
-      function mover(evt) {
-        if (!desenhando) return;
-        evt.preventDefault();
-        const p = ponto(evt);
-        ctx.lineTo(p.x, p.y);
-        ctx.stroke();
-      }
-
-      function finalizar(evt) {
-        if (!desenhando) return;
-        evt.preventDefault();
-        desenhando = false;
-        ctx.beginPath();
-      }
-
-      canvas.addEventListener("mousedown", iniciar);
-      canvas.addEventListener("mousemove", mover);
-      canvas.addEventListener("mouseup", finalizar);
-      canvas.addEventListener("mouseleave", finalizar);
-      canvas.addEventListener("touchstart", iniciar, { passive: false });
-      canvas.addEventListener("touchmove", mover, { passive: false });
-      canvas.addEventListener("touchend", finalizar, { passive: false });
-
-      ajustar();
-      window.addEventListener("resize", ajustar);
     }
 
     function limparFormulario() {
@@ -1020,22 +907,13 @@
       document.getElementById("quantidadeOcorrencias").value = "1";
       estado.quantidadeOcorrencias = 1;
       renderOcorrenciasTela();
-      limparAssinatura("assinaturaColaborador");
-      limparAssinatura("assinaturaLider");
-      limparAssinatura("assinaturaRH");
     }
 
     function iniciar() {
+      popularSelectColaborador();
       renderOcorrenciasTela();
 
-      configurarAssinatura("assinaturaColaborador");
-      configurarAssinatura("assinaturaLider");
-      configurarAssinatura("assinaturaRH");
-
-      document.getElementById("empresaSelect").addEventListener("change", function() {
-        document.getElementById("enderecoEmpregador").textContent = ENDERECO_FIXO;
-      });
-
+      document.getElementById("empresaSelect").addEventListener("change", atualizarEmpresaDuplicada);
       document.getElementById("colaboradorSelect").addEventListener("change", preencherDadosColaborador);
 
       document.getElementById("quantidadeOcorrencias").addEventListener("change", function() {
@@ -1048,31 +926,12 @@
         renderOcorrenciasTela();
       });
 
-      document.getElementById("arquivoExcel").addEventListener("change", async function(evt) {
-        const arquivo = evt.target.files && evt.target.files[0];
-        if (!arquivo) return;
-
-        try {
-          estado.funcionarios = await lerPlanilhaFuncionarios(arquivo);
-          popularSelectColaborador();
-          alert("Planilha carregada com sucesso.");
-        } catch (erro) {
-          alert(erro.message);
-        }
-      });
+      document.getElementById("btnLimparFormulario").addEventListener("click", limparFormulario);
 
       document.getElementById("btnImprimir").addEventListener("click", function() {
         if (!validarAntesImprimir()) return;
         montarFormularioImpressao();
         window.print();
-      });
-
-      document.getElementById("btnLimparFormulario").addEventListener("click", limparFormulario);
-
-      document.querySelectorAll("[data-clear]").forEach(btn => {
-        btn.addEventListener("click", function() {
-          limparAssinatura(this.getAttribute("data-clear"));
-        });
       });
 
       document.getElementById("enderecoEmpregador").textContent = ENDERECO_FIXO;
